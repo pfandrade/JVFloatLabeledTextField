@@ -93,6 +93,18 @@
     self.placeholder = self.placeholder; // Force the label to lay itself out with the new font.
 }
 
+- (void)setFloatingLabelTextColor:(UIColor *)floatingLabelTextColor
+{
+    _floatingLabelTextColor = floatingLabelTextColor;
+    [self updateFloatingLabelTextColor];
+}
+
+- (void)setFloatingLabelActiveTextColor:(UIColor *)floatingLabelActiveTextColor
+{
+    _floatingLabelActiveTextColor = floatingLabelActiveTextColor;
+    [self updateFloatingLabelTextColor];
+}
+
 - (void)showFloatingLabel:(BOOL)animated
 {
     void (^showBlock)() = ^{
@@ -159,6 +171,13 @@
     _floatingLabel.frame = CGRectMake(originX, _floatingLabel.frame.origin.y,
                                       _floatingLabel.frame.size.width, _floatingLabel.frame.size.height);
 }
+
+- (void)updateFloatingLabelTextColor
+{
+    BOOL firstResponder = self.isFirstResponder;
+    _floatingLabel.textColor = (firstResponder && self.text && self.text.length > 0 ? self.labelActiveColor : self.floatingLabelTextColor);
+}
+
 
 #pragma mark - UITextField
 
@@ -229,7 +248,6 @@
     }
     
     BOOL firstResponder = self.isFirstResponder;
-    _floatingLabel.textColor = (firstResponder && self.text && self.text.length > 0 ? self.labelActiveColor : self.floatingLabelTextColor);
     if (!self.text || 0 == [self.text length]) {
         [self hideFloatingLabel:firstResponder];
     }
