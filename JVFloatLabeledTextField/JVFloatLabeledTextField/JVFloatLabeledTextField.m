@@ -269,4 +269,15 @@
     return accessibilityLabel;
 }
 
+- (CGSize)intrinsicContentSize
+{
+    CGSize placeholderSize = [super intrinsicContentSize];
+    CGSize labelSize = [_floatingLabel intrinsicContentSize];
+    
+    return (CGSize){
+        .width = MAX(placeholderSize.width, labelSize.width),
+        .height = _floatingLabel.font.lineHeight + _placeholderYPadding + _placeholderYPadding + self.font.lineHeight,
+    };
+}
+
 @end
