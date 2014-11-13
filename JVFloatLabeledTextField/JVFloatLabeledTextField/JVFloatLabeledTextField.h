@@ -98,6 +98,11 @@
 @property (nonatomic, assign) NSTimeInterval floatingLabelHideAnimationDuration UI_APPEARANCE_SELECTOR;
 
 /**
+ * The Y offset the animation makes the floating label traverse. If set to 0, the floating lable just fades in.
+ * Defaults to 5 points.
+ */
+@property (nonatomic, assign) CGFloat floatingLabelAnimationYOffet UI_APPEARANCE_SELECTOR;
+/**
  *  Sets the placeholder and the floating title
  *
  *  @param placeholder The string that to be shown in the text field when no other text is present.

@@ -59,7 +59,6 @@
 - (void)commonInit
 {
     _floatingLabel = [UILabel new];
-    _floatingLabel.alpha = 0.0f;
     [self addSubview:_floatingLabel];
 	
     // some basic default fonts/colors
@@ -71,6 +70,7 @@
     _animateEvenIfNotFirstResponder = NO;
     _floatingLabelShowAnimationDuration = kFloatingLabelShowAnimationDuration;
     _floatingLabelHideAnimationDuration = kFloatingLabelHideAnimationDuration;
+    _floatingLabelAnimationYOffet = 5;
 }
 
 #pragma mark -
@@ -107,15 +107,27 @@
 
 - (void)showFloatingLabel:(BOOL)animated
 {
+    CGRect finalFrame = CGRectMake(_floatingLabel.frame.origin.x,
+                                   _floatingLabelYPadding,
+                                   _floatingLabel.frame.size.width,
+                                   _floatingLabel.frame.size.height);
+    
+    if (CGRectEqualToRect(_floatingLabel.frame, finalFrame)) return;
+    
     void (^showBlock)() = ^{
+        _floatingLabel.hidden = NO;
         _floatingLabel.alpha = 1.0f;
-        _floatingLabel.frame = CGRectMake(_floatingLabel.frame.origin.x,
-                                          _floatingLabelYPadding,
-                                          _floatingLabel.frame.size.width,
-                                          _floatingLabel.frame.size.height);
+        _floatingLabel.frame = finalFrame;
     };
     
+    
     if (animated || _animateEvenIfNotFirstResponder) {
+        // setup an initial frame
+        BOOL animating = [_floatingLabel.layer.modelLayer opacity] != [_floatingLabel.layer.presentationLayer opacity];
+        if (!animating) {
+            _floatingLabel.frame = CGRectApplyAffineTransform(finalFrame, CGAffineTransformMakeTranslation(0, self.floatingLabelAnimationYOffet));
+        }
+        
         [UIView animateWithDuration:_floatingLabelShowAnimationDuration
                               delay:0.0f
                             options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseOut
@@ -129,13 +141,13 @@
 
 - (void)hideFloatingLabel:(BOOL)animated
 {
+    CGRect finalFrame = _floatingLabel.frame;
+    finalFrame = CGRectApplyAffineTransform(finalFrame, CGAffineTransformMakeTranslation(0, self.floatingLabelAnimationYOffet));
+    if (CGRectEqualToRect(_floatingLabel.frame, finalFrame)) return;
+    
     void (^hideBlock)() = ^{
         _floatingLabel.alpha = 0.0f;
-        _floatingLabel.frame = CGRectMake(_floatingLabel.frame.origin.x,
-                                          _floatingLabel.font.lineHeight + _placeholderYPadding,
-                                          _floatingLabel.frame.size.width,
-                                          _floatingLabel.frame.size.height);
-
+        _floatingLabel.frame = finalFrame;
     };
     
     if (animated || _animateEvenIfNotFirstResponder) {
@@ -143,7 +155,7 @@
                               delay:0.0f
                             options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseIn
                          animations:hideBlock
-                         completion:nil];
+                         completion:NULL];
     }
     else {
         hideBlock();
